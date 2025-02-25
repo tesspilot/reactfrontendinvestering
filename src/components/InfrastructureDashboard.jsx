@@ -10,7 +10,8 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  Label
 } from 'recharts';
 
 const InfrastructureDashboard = () => {
@@ -56,10 +57,23 @@ const InfrastructureDashboard = () => {
       maximumFractionDigits: 0
     }).format(value);
   };
+
+  const renderCustomizedLabel = (props) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, index, name } = props;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
+    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
+    
+    return percent > 0.05 ? (
+      <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+        {name}
+      </text>
+    ) : null;
+  };
   
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Road Infrastructure Investment Dashboard</h1>
         
         {/* Summary Cards */}
@@ -105,15 +119,16 @@ const InfrastructureDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white p-6 rounded shadow">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Cost Breakdown</h2>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
+              <div style={{ width: '100%', height: 400 }}>
+                <ResponsiveContainer>
                   <PieChart>
                     <Pie
                       data={costBreakdown}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      outerRadius={80}
+                      label={renderCustomizedLabel}
+                      outerRadius={150}
                       fill="#8884d8"
                       dataKey="value"
                     >
@@ -122,7 +137,7 @@ const InfrastructureDashboard = () => {
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => formatCurrency(value)} />
-                    <Legend />
+                    <Legend verticalAlign="bottom" height={36} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -130,15 +145,16 @@ const InfrastructureDashboard = () => {
             
             <div className="bg-white p-6 rounded shadow">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Asset Type Distribution</h2>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
+              <div style={{ width: '100%', height: 400 }}>
+                <ResponsiveContainer>
                   <PieChart>
                     <Pie
                       data={assetTypes}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      outerRadius={80}
+                      label={renderCustomizedLabel}
+                      outerRadius={150}
                       fill="#8884d8"
                       dataKey="value"
                     >
@@ -147,7 +163,7 @@ const InfrastructureDashboard = () => {
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => formatCurrency(value)} />
-                    <Legend />
+                    <Legend verticalAlign="bottom" height={36} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -158,14 +174,14 @@ const InfrastructureDashboard = () => {
         {activeTab === 'investments' && (
           <div className="bg-white p-6 rounded shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Projected Investments by Decade</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
+            <div style={{ width: '100%', height: 400 }}>
+              <ResponsiveContainer>
                 <BarChart
                   data={decadeInvestments}
                   margin={{
                     top: 20,
                     right: 30,
-                    left: 20,
+                    left: 60,
                     bottom: 5,
                   }}
                 >
@@ -173,8 +189,10 @@ const InfrastructureDashboard = () => {
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={(value) => `€${value / 1000000}M`} />
                   <Tooltip formatter={(value) => formatCurrency(value)} />
-                  <Legend />
-                  <Bar dataKey="value" fill="#8884d8" name="Investment" />
+                  <Legend verticalAlign="top" height={36} />
+                  <Bar dataKey="value" fill="#8884d8" name="Investment">
+                    <Label position="top" formatter={(value) => formatCurrency(value)} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -184,23 +202,25 @@ const InfrastructureDashboard = () => {
         {activeTab === 'assets' && (
           <div className="bg-white p-6 rounded shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Asset Value Distribution</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
+            <div style={{ width: '100%', height: 400 }}>
+              <ResponsiveContainer>
                 <BarChart
                   data={assetTypes}
                   margin={{
                     top: 20,
                     right: 30,
-                    left: 20,
+                    left: 60,
                     bottom: 5,
                   }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
                   <YAxis tickFormatter={(value) => `€${value / 1000000}M`} />
                   <Tooltip formatter={(value) => formatCurrency(value)} />
-                  <Legend />
-                  <Bar dataKey="value" fill="#82ca9d" name="Value" />
+                  <Legend verticalAlign="top" height={36} />
+                  <Bar dataKey="value" fill="#82ca9d" name="Value">
+                    <Label position="top" formatter={(value) => formatCurrency(value)} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
